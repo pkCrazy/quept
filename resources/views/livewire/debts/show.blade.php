@@ -21,6 +21,11 @@
                     <flux:input type="number" min="0.01" step="0.01" wire:model="repaymentAmount" />
                     <flux:error name="repaymentAmount" />
                 </flux:field>
+                <flux:field class="min-w-72 flex-1">
+                    <flux:label>{{ __('Note (optional)') }}</flux:label>
+                    <flux:textarea wire:model="repaymentNote" rows="2" maxlength="500" />
+                    <flux:error name="repaymentNote" />
+                </flux:field>
                 <flux:button type="submit" variant="primary">{{ __('Add repayment') }}</flux:button>
             </form>
         </flux:card>
@@ -34,7 +39,10 @@
             <div wire:key="repayment-{{ $repayment->id }}" class="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 p-4 dark:border-neutral-700">
                 <div>
                     <p class="font-medium">{{ $repayment->user->name }}</p>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $repayment->created_at->format('M j, Y · H:i') }}</p>
+                    @if ($repayment->note !== null)
+                        <p class="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">{{ $repayment->note }}</p>
+                    @endif
+                    <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{{ $repayment->created_at->format('M j, Y · H:i') }}</p>
                 </div>
                 <p class="font-semibold">{{ Number::format((float) $repayment->amount, 2) }}</p>
             </div>

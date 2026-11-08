@@ -16,6 +16,8 @@ class Show extends Component
 
     public string $repaymentAmount = '';
 
+    public string $repaymentNote = '';
+
     public string $inviteEmail = '';
 
     public function mount(Debt $debt): void
@@ -28,6 +30,7 @@ class Show extends Component
     {
         $validated = $this->validate([
             'repaymentAmount' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:9999999999.99'],
+            'repaymentNote' => ['nullable', 'string', 'max:500'],
         ]);
 
         DB::transaction(function () use ($validated): void {
@@ -43,10 +46,12 @@ class Show extends Component
             $debt->repayments()->create([
                 'user_id' => Auth::id(),
                 'amount' => $validated['repaymentAmount'],
+                'note' => filled($validated['repaymentNote']) ? $validated['repaymentNote'] : null,
             ]);
         });
 
         $this->repaymentAmount = '';
+        $this->repaymentNote = '';
     }
 
     public function invite(): void

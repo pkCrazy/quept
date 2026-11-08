@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Repayment extends Model
 {
-    protected $fillable = ['debt_id', 'user_id', 'amount'];
+    protected $fillable = ['debt_id', 'user_id', 'amount', 'note'];
 
     protected function casts(): array
     {
