@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Debt extends Model
 {
-    protected $fillable = ['user_id', 'title', 'amount'];
+    protected $fillable = ['user_id', 'title', 'amount', 'note'];
 
     protected function casts(): array
     {
