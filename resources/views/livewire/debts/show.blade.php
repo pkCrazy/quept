@@ -6,9 +6,9 @@
             <flux:text>{{ __('Created by :name on :date', ['name' => $debt->owner->name, 'date' => $debt->created_at->format('M j, Y')]) }}</flux:text>
         </div>
         <flux:card class="min-w-56">
-            <flux:text>{{ __('Original amount') }}</flux:text>
-            <flux:heading size="xl">{{ Number::format((float) $debt->amount, 2) }}</flux:heading>
-            <flux:text>{{ __('Repaid :amount · Remaining :remaining', ['amount' => Number::format($repaid, 2), 'remaining' => Number::format($remaining, 2)]) }}</flux:text>
+            <flux:text>{{ __('Remaining amount') }}</flux:text>
+            <flux:heading size="xl">{{ Number::format($remaining, 2) }}</flux:heading>
+            <flux:text>{{ __('Repaid :amount · Original :original', ['amount' => Number::format($repaid, 2), 'original' => Number::format((float) $debt->amount, 2)]) }}</flux:text>
         </flux:card>
     </div>
 
@@ -43,7 +43,13 @@
                     @endif
                     <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{{ $repayment->created_at->format('M j, Y · H:i') }}</p>
                 </div>
-                <p class="font-semibold">{{ Number::format((float) $repayment->amount, 2) }}</p>
+                <div class="text-end">
+                    @if ((float) $repayment->amount === 0.0)
+                        <p class="font-semibold">{{ __('No payment') }}</p>
+                    @else
+                        <p class="font-semibold">{{ Number::format((float) $repayment->amount, 2) }}</p>
+                    @endif
+                </div>
             </div>
         @empty
             <flux:card><flux:text>{{ __('No repayments recorded yet.') }}</flux:text></flux:card>
@@ -55,11 +61,11 @@
         <form wire:submit="addRepayment" class="flex flex-col gap-6">
             <div>
                 <flux:heading size="lg">{{ __('Record a repayment') }}</flux:heading>
-                <flux:text>{{ __('Add the amount paid back and an optional note.') }}</flux:text>
+                <flux:text>{{ __('Record the amount paid back, or enter 0 with a note to record a missed payment.') }}</flux:text>
             </div>
             <flux:field>
-                <flux:label>{{ __('Amount paid back') }}</flux:label>
-                <flux:input type="number" min="0.01" step="0.01" wire:model="repaymentAmount" />
+                <flux:label>{{ __('Amount paid back (enter 0 to record a missed payment)') }}</flux:label>
+                <flux:input type="number" min="0" step="0.01" wire:model="repaymentAmount" />
                 <flux:error name="repaymentAmount" />
             </flux:field>
             <flux:field>

@@ -29,8 +29,8 @@ class Show extends Component
     public function addRepayment(): void
     {
         $validated = $this->validate([
-            'repaymentAmount' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:9999999999.99'],
-            'repaymentNote' => ['nullable', 'string', 'max:500'],
+            'repaymentAmount' => ['required', 'numeric', 'gte:0', 'decimal:0,2', 'max:9999999999.99'],
+            'repaymentNote' => ['nullable', 'required_if:repaymentAmount,0', 'string', 'max:500'],
         ]);
 
         DB::transaction(function () use ($validated): void {
