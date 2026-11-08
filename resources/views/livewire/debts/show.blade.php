@@ -12,26 +12,25 @@
         </flux:card>
     </div>
 
-    @if ($remaining > 0)
-        <flux:card class="flex flex-col gap-4">
-            <flux:heading size="lg">{{ __('Record a repayment') }}</flux:heading>
-            <form wire:submit="addRepayment" class="flex flex-wrap items-end gap-4">
-                <flux:field class="w-56">
-                    <flux:label>{{ __('Amount paid back') }}</flux:label>
-                    <flux:input type="number" min="0.01" step="0.01" wire:model="repaymentAmount" />
-                    <flux:error name="repaymentAmount" />
-                </flux:field>
-                <flux:field class="min-w-72 flex-1">
-                    <flux:label>{{ __('Note (optional)') }}</flux:label>
-                    <flux:textarea wire:model="repaymentNote" rows="2" maxlength="500" />
-                    <flux:error name="repaymentNote" />
-                </flux:field>
-                <flux:button type="submit" variant="primary">{{ __('Add repayment') }}</flux:button>
-            </form>
-        </flux:card>
-    @else
-        <flux:callout variant="success" heading="{{ __('This debt is fully repaid.') }}" />
-    @endif
+    <div class="flex gap-2">
+        @if ($remaining > 0)
+            <div>
+                <flux:modal.trigger name="add-repayment">
+                    <flux:button variant="primary">{{ __('Record a repayment') }}</flux:button>
+                </flux:modal.trigger>
+            </div>
+        @else
+            <flux:callout variant="success" heading="{{ __('This debt is fully repaid.') }}" />
+        @endif
+
+        @if (auth()->id() === $debt->user_id)
+            <div>
+                <flux:modal.trigger name="share-debt">
+                    <flux:button>{{ __('Share this debt') }}</flux:button>
+                </flux:modal.trigger>
+            </div>
+        @endif
+    </div>
 
     <section class="flex flex-col gap-3">
         <flux:heading size="lg">{{ __('Repayment history') }}</flux:heading>
@@ -51,25 +50,55 @@
         @endforelse
     </section>
 
+
+    <flux:modal name="add-repayment" class="max-w-lg">
+        <form wire:submit="addRepayment" class="flex flex-col gap-6">
+            <div>
+                <flux:heading size="lg">{{ __('Record a repayment') }}</flux:heading>
+                <flux:text>{{ __('Add the amount paid back and an optional note.') }}</flux:text>
+            </div>
+            <flux:field>
+                <flux:label>{{ __('Amount paid back') }}</flux:label>
+                <flux:input type="number" min="0.01" step="0.01" wire:model="repaymentAmount" />
+                <flux:error name="repaymentAmount" />
+            </flux:field>
+            <flux:field>
+                <flux:label>{{ __('Note (optional)') }}</flux:label>
+                <flux:textarea wire:model="repaymentNote" rows="3" maxlength="500" />
+                <flux:error name="repaymentNote" />
+            </flux:field>
+            <div class="flex justify-end gap-2">
+                <flux:modal.close><flux:button variant="filled">{{ __('Cancel') }}</flux:button></flux:modal.close>
+                <flux:button type="submit" variant="primary">{{ __('Add repayment') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
+
     @if (auth()->id() === $debt->user_id)
-        <flux:card class="flex flex-col gap-4">
-            <flux:heading size="lg">{{ __('Share this debt') }}</flux:heading>
-            <flux:text>{{ __('Invite an existing account by email. They can view the history and add repayments.') }}</flux:text>
-            <form wire:submit="invite" class="flex flex-wrap items-end gap-4">
-                <flux:field class="w-72">
+        <flux:modal name="share-debt" class="max-w-lg">
+            <form wire:submit="invite" class="flex flex-col gap-6">
+                <div>
+                    <flux:heading size="lg">{{ __('Share this debt') }}</flux:heading>
+                    <flux:text>{{ __('Invite an existing account by email. They can view the history and add repayments.') }}</flux:text>
+                </div>
+                <flux:field>
                     <flux:label>{{ __('Account email') }}</flux:label>
                     <flux:input type="email" wire:model="inviteEmail" />
                     <flux:error name="inviteEmail" />
                 </flux:field>
-                <flux:button type="submit">{{ __('Share debt') }}</flux:button>
-            </form>
-            @if ($debt->users->isNotEmpty())
-                <div class="flex flex-wrap gap-2">
-                    @foreach ($debt->users as $user)
-                        <flux:badge wire:key="shared-user-{{ $user->id }}">{{ $user->name }} · {{ $user->email }}</flux:badge>
-                    @endforeach
+                @if ($debt->users->isNotEmpty())
+                    <div class="flex flex-col gap-2">
+                        <flux:text>{{ __('People with access') }}</flux:text>
+                        @foreach ($debt->users as $user)
+                            <flux:badge wire:key="shared-user-{{ $user->id }}">{{ $user->name }} · {{ $user->email }}</flux:badge>
+                        @endforeach
+                    </div>
+                @endif
+                <div class="flex justify-end gap-2">
+                    <flux:modal.close><flux:button variant="filled">{{ __('Cancel') }}</flux:button></flux:modal.close>
+                    <flux:button type="submit" variant="primary">{{ __('Share debt') }}</flux:button>
                 </div>
-            @endif
-        </flux:card>
+            </form>
+        </flux:modal>
     @endif
 </div>

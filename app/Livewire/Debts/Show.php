@@ -52,6 +52,7 @@ class Show extends Component
 
         $this->repaymentAmount = '';
         $this->repaymentNote = '';
+        $this->modal('add-repayment')->close();
     }
 
     public function invite(): void
@@ -68,6 +69,7 @@ class Show extends Component
 
         $this->debt->users()->syncWithoutDetaching([$user->id]);
         $this->inviteEmail = '';
+        $this->modal('share-debt')->close();
     }
 
     private function authorizeAccess(Debt $debt): void
