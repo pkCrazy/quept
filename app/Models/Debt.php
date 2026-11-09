@@ -13,7 +13,7 @@ class Debt extends Model
 
     protected function casts(): array
     {
-        return ['amount' => 'decimal:2'];
+        return ['amount' => 'integer'];
     }
 
     public function owner(): BelongsTo

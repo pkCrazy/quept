@@ -14,7 +14,7 @@
             </flux:field>
             <flux:field>
                 <flux:label>{{ __('Original amount') }}</flux:label>
-                <flux:input type="number" min="0.01" step="0.01" wire:model="amount" />
+                <flux:input type="number" min="1" step="1" wire:model="amount" />
                 <flux:error name="amount" />
             </flux:field>
             <flux:button type="submit" variant="primary">{{ __('Create debt') }}</flux:button>
@@ -24,7 +24,7 @@
     <section class="flex flex-col gap-3">
         <flux:heading size="lg">{{ __('Your debts and shared debts') }}</flux:heading>
         @forelse ($debts as $debt)
-            @php($repaid = (float) $debt->repayments->sum('amount'))
+            @php($repaid = (int) $debt->repayments->sum('amount'))
             <a href="{{ route('debts.show', $debt) }}" wire:navigate class="block rounded-xl border border-neutral-200 p-5 transition hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-500">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
@@ -32,7 +32,7 @@
                         <flux:text>{{ __('Created by :name', ['name' => $debt->owner->name]) }}</flux:text>
                     </div>
                     <div class="text-end text-sm">
-                        <p class="font-medium">{{ Number::format($repaid, 2) }} / {{ Number::format((float) $debt->amount, 2) }}</p>
+                        <p class="font-medium">{{ Number::format($repaid) }} / {{ Number::format($debt->amount) }} HUF</p>
                         <p class="text-zinc-500 dark:text-zinc-400">{{ __('repaid') }}</p>
                     </div>
                 </div>

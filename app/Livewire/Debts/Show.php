@@ -29,15 +29,15 @@ class Show extends Component
     public function addRepayment(): void
     {
         $validated = $this->validate([
-            'repaymentAmount' => ['required', 'numeric', 'gte:0', 'decimal:0,2', 'max:9999999999.99'],
+            'repaymentAmount' => ['required', 'integer', 'gte:0', 'max:999999999999'],
             'repaymentNote' => ['nullable', 'required_if:repaymentAmount,0', 'string', 'max:500'],
         ]);
 
         DB::transaction(function () use ($validated): void {
             $debt = Debt::query()->lockForUpdate()->findOrFail($this->debt->id);
-            $remaining = (float) $debt->amount - (float) $debt->repayments()->sum('amount');
+            $remaining = $debt->amount - (int) $debt->repayments()->sum('amount');
 
-            if ((float) $validated['repaymentAmount'] > $remaining) {
+            if ((int) $validated['repaymentAmount'] > $remaining) {
                 throw ValidationException::withMessages([
                     'repaymentAmount' => 'The repayment cannot exceed the remaining balance.',
                 ]);
@@ -84,8 +84,8 @@ class Show extends Component
     {
         $this->authorizeAccess($this->debt);
         $debt = $this->debt->load(['owner', 'users', 'repayments.user']);
-        $repaid = (float) $debt->repayments->sum('amount');
-        $remaining = max(0, (float) $debt->amount - $repaid);
+        $repaid = (int) $debt->repayments->sum('amount');
+        $remaining = max(0, $debt->amount - $repaid);
 
         return view('livewire.debts.show', compact('debt', 'repaid', 'remaining'))
             ->layout('layouts.app', ['title' => $debt->title]);

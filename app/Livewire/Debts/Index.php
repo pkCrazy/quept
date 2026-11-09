@@ -17,7 +17,7 @@ class Index extends Component
     {
         $validated = $this->validate([
             'title' => ['required', 'string', 'max:255'],
-            'amount' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:9999999999.99'],
+            'amount' => ['required', 'integer', 'gt:0', 'max:999999999999'],
         ]);
 
         $debt = Auth::user()->debts()->create($validated);
